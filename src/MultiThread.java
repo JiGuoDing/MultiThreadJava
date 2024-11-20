@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 public class MultiThread extends Thread{
     /*
         @Override主要用于标识子类方法重写了父类或接口中的方法。
