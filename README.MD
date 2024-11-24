@@ -30,3 +30,68 @@
 ***线程状态转换图***
 ![](./src/ThreadMap.jpg)    
 
+### `Future` 工作机制
+
+`Future<Type> future` `Future`是Java提供的一个接口，
+表示一个 **异步任务** 的 **执行结果** 或 **状态**。  
+**注**：任务的执行是异步的，也就是说主线程不会阻塞。  
+`Future的作用`
+- 检查任务是否完成
+- 获取任务的执行结果
+- 如果任务没有完成，可以阻塞等待结果
+
+**future.get()** 方法返回 `Callable` 的 `call`
+方法的返回值，如果任务未完成，会阻塞调用 `future.get()`
+方法的线程去等待。 其中阻塞操作是由 `future.get()` 
+方法**执行的**。
+
+**future.isDone()** 方法检查任务是否 **已完成**。
+如果已完成则返回 `true`。  
+
+**future.isCancelled()** 方法检查任务是否 **已取消**。  
+
+**future.cancel(boolean mayInterruptIfRunning)** 
+方法取消任务的执行，如果任务已经完成或被取消，该方法会返回 `false`。
+参数 `mayInterruptIfRunning` 指定是否尝试中断 **正在运行** 的任务。
+
+#### `Future` 使用示例  
+```Java
+import java.util.concurrent.*;
+
+public class FutureExample {
+    public static void main(String[] args) {
+        // 创建线程池
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        // 提交一个 Callable 任务
+        Future<Integer> future = executor.submit(() -> {
+            System.out.println("Task starts...");
+            Thread.sleep(2000); // 模拟耗时操作
+            System.out.println("Task completed!");
+            return 42;
+        });
+
+        System.out.println("Main thread continues...");
+
+        try {
+            // 获取任务结果（会阻塞直到任务完成）
+            Integer result = future.get();
+            System.out.println("Task result: " + result);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            // 关闭线程池
+            executor.shutdown();
+        }
+    }
+}
+
+```
+
+##### 输出示例  
+```
+Main thread continues...
+Task starts...
+Task completed!
+Task result: 42
+```
